@@ -1,0 +1,59 @@
+# Task for all Master & Minion
+- hosts: all
+  become: true
+  tasks:
+        - name: Install Kubernetes, NTP, Docker
+          yum: 
+                name: "{{item}}"
+                state: present
+          with_items:
+                - kubernetes
+                - docker
+                - ntp
+
+# Task to configure Master
+- hosts: master
+  become: true
+  tasks:
+        - name: Install etcd
+          yum:
+                name: etcd
+                state: present
+          #stop kubectl kube-proxy etcd
+        - name: stop kubectl kube-proxy etcd service
+          systemd:
+                name: "{{item}}"
+                state: stopped
+          with_items:
+                - kubectl
+                - kube-proxy
+                - etcd
+
+          #copy config file to /etc/kubernetes
+        - name: copy config file to /etc/kubernetes
+          copy:
+                src: "{{item.src}}"
+                dest: "{item.des}}"
+                backup: yes
+          with_items:
+                - { src: 'ConfigFile/master/apiserver', des: '/etc/kubernetes' }
+                - { src: 'ConfigFile/master/config', des: '/etc/kubernetes' }
+                - { src: 'ConfigFile/master/etcd.conf', des: '/etc/etcd' }
+          #start kubectl kube-proxy
+        - name: start kubernetes and etcd services
+          systemd:
+                name: "{{item}}"
+                state: started
+          with_items:
+                - kubectl
+                - kube-proxy
+                - etcd
+          #enable kubectl kube-proxy
+        - name: enable kubernetes and etcd services
+          systemd:
+                name: "{{item}}"
+                enabled: yes
+          with_items:
+                - kubectl
+                - kube-proxy
+                - etcd
