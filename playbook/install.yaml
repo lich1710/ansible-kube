@@ -25,35 +25,38 @@
                 name: "{{item}}"
                 state: stopped
           with_items:
-                - kubectl
-                - kube-proxy
+                - kube-apiserver
+                - kube-controller-manager
+                - kube-scheduler
                 - etcd
-
           #copy config file to /etc/kubernetes
         - name: copy config file to /etc/kubernetes
           copy:
                 src: "{{item.src}}"
-                dest: "{item.des}}"
+                dest: "{{item.des}}"
                 backup: yes
           with_items:
-                - { src: 'ConfigFile/master/apiserver', des: '/etc/kubernetes' }
-                - { src: 'ConfigFile/master/config', des: '/etc/kubernetes' }
-                - { src: 'ConfigFile/master/etcd.conf', des: '/etc/etcd' }
+                - { src: 'ConfigFile/master/apiserver', des: '/etc/kubernetes/apiserver' }
+                - { src: 'ConfigFile/master/config', des: '/etc/kubernetes/config' }
+                - { src: 'ConfigFile/master/etcd.conf', des: '/etc/etcd/etcd.conf' }
           #start kubectl kube-proxy
         - name: start kubernetes and etcd services
           systemd:
                 name: "{{item}}"
                 state: started
           with_items:
-                - kubectl
-                - kube-proxy
-                - etcd
           #enable kubectl kube-proxy
+                - kube-apiserver
+                - kube-controller-manager
+                - kube-scheduler
+                - etcd
         - name: enable kubernetes and etcd services
           systemd:
                 name: "{{item}}"
                 enabled: yes
           with_items:
-                - kubectl
-                - kube-proxy
+                - kube-apiserver
+                - kube-controller-manager
+                - kube-scheduler
                 - etcd
+                - ntpd
