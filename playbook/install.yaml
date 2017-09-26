@@ -40,23 +40,16 @@
                 - { src: 'ConfigFile/master/config', des: '/etc/kubernetes/config' }
                 - { src: 'ConfigFile/master/etcd.conf', des: '/etc/etcd/etcd.conf' }
           #start kubectl kube-proxy
-        - name: start kubernetes and etcd services
+        - name: start and enable kubernetes and etcd services
           systemd:
                 name: "{{item}}"
                 state: started
+                enabled: yes
           with_items:
           #enable kubectl kube-proxy
                 - kube-apiserver
                 - kube-controller-manager
                 - kube-scheduler
                 - etcd
-        - name: enable kubernetes and etcd services
-          systemd:
-                name: "{{item}}"
-                enabled: yes
-          with_items:
-                - kube-apiserver
-                - kube-controller-manager
-                - kube-scheduler
-                - etcd
                 - ntpd
+
