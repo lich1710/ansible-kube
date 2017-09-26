@@ -1,0 +1,13 @@
+---
+- name: Start and enable services  
+  systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+  with_items:
+        - kube-apiserver
+        - kube-controller-manager
+        - kube-scheduler
+        - etcd
+        - docker
+        - ntpd

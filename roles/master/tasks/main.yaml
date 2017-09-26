@@ -1,45 +1,28 @@
-# Task for Master
-become: true
+---
 - name: Install Kubernetes, NTP, Docker
   yum: 
-        name: "{{item}}"
+        name: "{{ item }}"
         state: present
-        with_items:
+  with_items:
         - kubernetes
         - docker
         - ntp
         - etcd
+  notify:
+        - start services
 
-#stop kubectl kube-proxy etcd
-- name: stop kubectl kube-proxy etcd service
-  systemd:
-        name: "{{item}}"
-        state: stopped
-        with_items:
-        - kube-apiserver
-        - kube-controller-manager
-        - kube-scheduler
-        - etcd
 #copy config file to /etc/kubernetes
 - name: copy config file to /etc/kubernetes
   copy:
-        src: "{{item.src}}"
-        dest: "{{item.des}}"
+        src: "{{ item.src }}"
+        dest: "{{ item.des }}"
         backup: yes
-        with_items:
-        - { src: 'ConfigFile/master/apiserver', des: '/etc/kubernetes/apiserver' }
-        - { src: 'ConfigFile/master/config', des: '/etc/kubernetes/config' }
-        - { src: 'ConfigFile/master/etcd.conf', des: '/etc/etcd/etcd.conf' }
-#start kubectl kube-proxy
-- name: start and enable kubernetes and etcd services
-  systemd:
-        name: "{{item}}"
-        state: started
-        enabled: yes
-        with_items:
-        - kube-apiserver
-        - kube-controller-manager
-        - kube-scheduler
-        - etcd
-        - ntpd
+  with_items:
+        - { src: 'apiserver', des: '/etc/kubernetes/apiserver' }
+        - { src: 'config', des: '/etc/kubernetes/config' }
+        - { src: 'etcd.conf', des: '/etc/etcd/etcd.conf' }
+  notify:
+        - restart services
+- include: enableService.yaml
+
 
