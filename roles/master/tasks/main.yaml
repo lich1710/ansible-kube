@@ -1,0 +1,28 @@
+---
+- name: Install Kubernetes, NTP, Docker
+  yum: 
+        name: "{{ item }}"
+        state: present
+  with_items:
+        - kubernetes
+        - docker
+        - ntp
+        - etcd
+  notify:
+        - start services
+
+#copy config file to /etc/kubernetes
+- name: copy config file to /etc/kubernetes
+  copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.des }}"
+        backup: yes
+  with_items:
+        - { src: 'apiserver', des: '/etc/kubernetes/apiserver' }
+        - { src: 'config', des: '/etc/kubernetes/config' }
+        - { src: 'etcd.conf', des: '/etc/etcd/etcd.conf' }
+  notify:
+        - restart services
+- include: enableService.yaml
+
+
