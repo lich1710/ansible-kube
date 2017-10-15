@@ -1,0 +1,30 @@
+---
+- name: restart services
+  systemd:
+        name: "{{ item }}"
+        state: restarted
+  with_items:
+        - kube-proxy
+        - kubelet
+        - docker
+
+- name: enabled services
+  systemd:
+        name: "{{ item }}"
+        enabled: yes
+  with_items:
+        - ntpd
+        - kube-proxy
+        - kubelet
+        - docker
+
+- name: start services
+  systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+  with_items:
+        - ntpd
+        - kube-proxy
+        - kubelet
+        - docker
