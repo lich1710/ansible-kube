@@ -2,3 +2,6 @@
 - hosts: master
   roles:
         - { role: master, become: yes }
+#- hosts: minion1
+#  roles:
+#        - { role: minion, become: yes }

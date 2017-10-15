@@ -46,6 +46,6 @@
 
 master	ansible_connection=local
 
-[node]
+[minion]
 
 minion[1:3]	ansible_connection=ssh	ansible_user=user
