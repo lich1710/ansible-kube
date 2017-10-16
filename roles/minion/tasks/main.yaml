@@ -17,8 +17,9 @@
         dest: "{{ item.des }}"
         backup: yes
   with_items:
-        - { src: 'kubelet', des: '/etc/kubernetes/kubelet' }
         - { src: 'config', des: '/etc/kubernetes/config' }
+- name: copy template file to /etc/kubernetes/kubelet
+  template: src=../files/kubelet.j2 dest=/etc/kubernetes/kubelet
   notify:
         - restart services
 - include: enableService.yaml
